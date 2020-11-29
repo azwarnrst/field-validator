@@ -79,7 +79,6 @@ func (v *FormValidator) validateType(label, data string, dataVal reflect.Value) 
 	default:
 		dataVal.SetString(data)
 	}
-
 	return
 }
 
@@ -89,18 +88,13 @@ func (v *FormValidator) ValidateFormData(r *http.Request, data interface{}) (err
 		return errors.New("failed to parse form data")
 	}
 
-	if reflect.ValueOf(data).Kind() != reflect.Ptr {
-		return errors.New("invalid data type")
-	}
-
-	if reflect.ValueOf(data).Elem().Kind() != reflect.Struct {
-		return errors.New("invalid form struct")
+	if reflect.ValueOf(data).Kind() != reflect.Ptr || reflect.ValueOf(data).Elem().Kind() != reflect.Struct {
+		return errors.New("invalid struct form data")
 	}
 
 	val := reflect.Indirect(reflect.ValueOf(data))
 	dataElement := reflect.ValueOf(data).Elem()
 	for i := 0; i < val.NumField(); i++ {
-
 		tagName := val.Type().Field(i).Tag.Get("name")
 		if tagName == "" {
 			err = errors.New("struct tag:name cannot be empty")
@@ -124,7 +118,6 @@ func (v *FormValidator) ValidateFormData(r *http.Request, data interface{}) (err
 				break
 			}
 			dataElement.Field(i).Set(data)
-
 		}
 	}
 
