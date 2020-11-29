@@ -38,37 +38,29 @@ func (x *XRouter) UserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (x *XRouter) UserHandler2(w http.ResponseWriter, r *http.Request) {
+	var (
+		err         error
+		data        []byte
+		respData    HttpResp
+		valFormData = UserFormData{}
+	)
 
-	formData := UserFormData{}
-	//err := json.NewDecoder(r.Body).Decode(&formData)
-	//err := x.FormValidator.ValidateFormData(formData)
-	//if err != nil {
-	//
-	//}
-
-	Uname := r.FormValue("user_name")
-	UserID, err := strconv.Atoi(r.FormValue("user_id"))
-	FullName := r.FormValue("full_name")
-	Email := r.FormValue("email")
-	Address := r.FormValue("address")
-	IsPartner, err := strconv.ParseBool(r.FormValue("is_partner"))
-
-	//log.Printf("%+v", r.Form)
-
-	formData := UserFormData{
-		UserName:          Uname,
-		UserID:            UserID,
-		UserMail:          Email,
-		UserFullName:      FullName,
-		UserAddress:       Address,
-		IsOfficialPartner: IsPartner,
+	err = NewValidator().ValidateFormData(r, &valFormData)
+	if err != nil {
+		log.Printf("invalid form data  : %+v", err)
+		respData.Header.Status = http.StatusBadRequest
+		respData.Header.Message = err.Error()
+	} else {
+		respData.Header.Status = http.StatusOK
+		respData.Data = valFormData
 	}
-	data, err := json.Marshal(&formData)
+
+	data, err = json.Marshal(&respData)
 	if err != nil {
 		log.Printf("error marshal form data, err %+v\n", err)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(respData.Header.Status)
 	w.Write(data)
 }
