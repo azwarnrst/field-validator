@@ -1,4 +1,4 @@
-package router
+package types
 
 type UserFormData struct {
 	UserName          string `json:"user_name" name:"user_name" required:"true"`

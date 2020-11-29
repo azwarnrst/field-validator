@@ -2,13 +2,15 @@ package router
 
 import (
 	"encoding/json"
+	"github.com/azwarnrst/field-validator/internal/types"
+	"github.com/azwarnrst/field-validator/internal/validator"
 	"log"
 	"net/http"
 	"strconv"
 )
 
 type XRouter struct {
-	FormValidator FormValidator
+	FormValidator validator.FormValidator
 }
 
 func (x *XRouter) UserHandler(w http.ResponseWriter, r *http.Request) {
@@ -19,7 +21,7 @@ func (x *XRouter) UserHandler(w http.ResponseWriter, r *http.Request) {
 	Address := r.FormValue("address")
 	IsPartner, err := strconv.ParseBool(r.FormValue("is_partner"))
 
-	formData := UserFormData{
+	formData := types.UserFormData{
 		UserName:          Uname,
 		UserID:            UserID,
 		UserMail:          Email,
@@ -41,11 +43,11 @@ func (x *XRouter) UserHandler2(w http.ResponseWriter, r *http.Request) {
 	var (
 		err         error
 		data        []byte
-		respData    HttpResp
-		valFormData = UserFormData{}
+		respData    types.HttpResp
+		valFormData = types.UserFormData{}
 	)
 
-	err = NewValidator().ValidateFormData(r, &valFormData)
+	err = validator.NewValidator().ValidateFormData(r, &valFormData)
 	if err != nil {
 		log.Printf("invalid form data  : %+v", err)
 		respData.Header.Status = http.StatusBadRequest
