@@ -1,6 +1,6 @@
 ## form field validation helper
 
-simple form input validation helper, to simplify parse input form & validate data 
+simple form input validation helper, to simplify parse input form & validate data
 
 
 * example request 

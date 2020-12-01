@@ -83,6 +83,10 @@ func (v *FormValidator) validateType(label, data string, dataVal reflect.Value) 
 }
 
 func (v *FormValidator) ValidateFormData(r *http.Request, data interface{}) (err error) {
+	var (
+		minCharLen int
+	)
+
 	err = r.ParseForm()
 	if err != nil {
 		return errors.New("failed to parse form data")
@@ -108,6 +112,16 @@ func (v *FormValidator) ValidateFormData(r *http.Request, data interface{}) (err
 				break
 			} else {
 				continue
+			}
+		}
+
+		if val.Type().Field(i).Tag.Get("min_length") != "" {
+			minCharLen, err = strconv.Atoi(val.Type().Field(i).Tag.Get("min_length"))
+			if err == nil {
+				if len(formVal) < minCharLen {
+					err = errors.New("minimum " + val.Type().Field(i).Tag.Get("min_length") + " character length for " + tagName)
+					break
+				}
 			}
 		}
 
